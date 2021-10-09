@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -43,7 +42,6 @@ func createuser(response http.ResponseWriter, request *http.Request) {
 	_ = json.NewDecoder(request.Body).Decode((&instauser))
 	hashpassword := GetMD5Hash(instauser.Password) // Will not be able to retrieve back
 	instauser.Password = hashpassword
-	//fmt.Println(instauser.Password)
 	collection := client.Database("appointy").Collection("instausers")
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	result, _ := collection.InsertOne(ctx, instauser)
@@ -52,20 +50,13 @@ func createuser(response http.ResponseWriter, request *http.Request) {
 
 func getUser(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("content-type", "application/json")
-	//params=
-	//id, _ := primitive.ObjectIDFromHex(params["id"])
-	//urlParams := request.URL.Query()
 	temp := strings.Split(request.URL.Path, "/")
 	uid := temp[len(temp)-1]
 	id, _ := primitive.ObjectIDFromHex(uid)
-	//fmt.Println(id)
 	var instauser Instauser
 	collection := client.Database("appointy").Collection("instausers")
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
 	err := collection.FindOne(ctx, Instauser{ID: id}).Decode(&instauser)
-	//fmt.Println(instauser.Email)
-	//temb:=db.instausers.FindOne({"_id":"6161659378289d3f64f6e2ad"})
-	//fmt.println(temb)
 	if err != nil {
 		response.WriteHeader(http.StatusInternalServerError)
 		response.Write([]byte(`{ "message": "` + err.Error() + `" }`))
@@ -78,7 +69,6 @@ func createpost(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("content-type", "application/json")
 	var instapost Instapost
 	_ = json.NewDecoder(request.Body).Decode((&instapost))
-
 	collection := client.Database("appointy").Collection("instaposts")
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	result, _ := collection.InsertOne(ctx, instapost)
@@ -108,7 +98,7 @@ func getallpost(response http.ResponseWriter, request *http.Request) {
 
 	temp := strings.Split(request.URL.Path, "/")
 	uid := temp[len(temp)-1]
-	//id, _ := primitive.ObjectIDFromHex(uid)
+	
 	var instapost []Instapost
 	collection := client.Database("appointy").Collection("instaposts")
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
@@ -125,27 +115,11 @@ func getallpost(response http.ResponseWriter, request *http.Request) {
 		response.Write([]byte(`{ "message": "` + err.Error() + `" }`))
 		return
 	}
-
-	//err, := collection.Find(ctx,Instapost{UserPostId: uid}).Decode(&instapost)
-	//err, _ := collection.Find(ctx, bson.M{"userpostid": uid})
-	//cur,currErr :=collective.Find(ctx, bson.M{""})
-
-	// err := collection.FindOne(ctx, bson.M{"userpostid": uid}).Decode(&instapost)
-
-	// } else {
-	// 	// Print out data from the document result
-	// 	fmt.Println("result AFTER:", instapost, "\n")
-	//err =db.collection.Find(ctx,{"userpostid":uid});
-	// if err != nil {
-	// 	response.WriteHeader(http.StatusInternalServerError)
-	// 	//response.Write([]byte(`{ "message": "` + err.Error() + `" }`))
-	// 	return
-	// }
 	json.NewEncoder(response).Encode(instapost)
 }
 
 func main() {
-	fmt.Println("Hi vasuki")
+	fmt.Println("Hi Users The server is started !!")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
 	client, _ = mongo.Connect(ctx, clientOptions)
