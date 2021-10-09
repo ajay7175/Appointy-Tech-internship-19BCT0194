@@ -1,7 +1,7 @@
 # Appointy-Tech-internship-19BCT0194
 
 Steps to run the file
-
+ 
 Just clone the repository and open in your favourite code editor
 in command line add "go run main.go" so the server is started on port 8080
 
